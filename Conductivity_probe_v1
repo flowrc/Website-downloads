@@ -1,0 +1,48 @@
+/*
+This is the Arduino sketch for the conductivity probe.
+Version 1 - Initial design that report values through to the serial monitor
+*/
+
+int inputPin = A0;
+
+const float closedVoltage = 5.00;                //assumed value of voltage (replace with vcc)
+const float voltageRange = closedVoltage/1024;   //Used to map the analog reading to the voltage of the circuit.
+const float resistor = 10000.00;                  //size of resistor on the ground line 
+int conductReading = 0;                        //reading from A0 pin
+float conductVoltage = 0.00;                  //calculated voltage from reading
+float resistance = 0.00;                    //calculated resistance of water (ohms)
+float area = 0.0002;                          //area of the all four sides of the electrodes in square meters
+float length = 0.01;                        //distance between the electrodes in meters
+float resistivity = 0.0;                    //resistivity of fluid
+float conductivity = 0.00;                  //calculated conductivity of water (micro-siemens/m)
+
+
+
+void setup(){
+
+  Serial.begin(9600);
+
+  
+  pinMode(inputPin, INPUT);
+
+}
+
+void loop(){
+  
+  conductReading = analogRead(inputPin);
+
+  conductVoltage = conductReading * voltageRange;
+ 
+  resistance = ((closedVoltage * resistor)/conductVoltage) - resistor;
+  
+  resistivity = resistance * area / length;
+  
+  conductivity = (1 / resistivity)*1000;
+   
+Serial.print(conductReading);
+Serial.print(", Conductivity (milliSiemens/m) =");
+Serial.println(conductivity);
+
+  delay(1000);
+  
+}
